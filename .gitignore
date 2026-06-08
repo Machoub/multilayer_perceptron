@@ -1,0 +1,13 @@
+# Environnement virtuel
+.venv/
+
+# Caches Python
+__pycache__/
+*.pyc
+
+# Fichiers générés par les programmes
+data_train.csv
+data_valid.csv
+saved_model.npy
+learning_curves.png
+data_features.png
