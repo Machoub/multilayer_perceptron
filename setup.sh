@@ -3,25 +3,30 @@
 # Stop le script si une commande échoue
 set -e
 
-echo "🚀 Création de l'environnement virtuel..."
-python3 -m venv .venv
+echo "🚀 Création de l'environnement virtuel avec uv..."
+# uv crée automatiquement un dossier .venv très rapidement
+uv venv .venv
 
 echo "✅ Activation de l'environnement..."
-# Active l'environnement en fonction du système
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    source .venv/bin/activate
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    source .venv/bin/activate
-elif [[ "$OSTYPE" == "msys"* ]]; then
-    source .venv/Scripts/activate
+# Détermine le chemin du script d'activation selon le système
+if [[ "$OSTYPE" == "msys"* ]]; then
+    ACTIVATE_SCRIPT=".venv/Scripts/activate"
 else
-    echo "⚠️  Système non reconnu, active manuellement le venv."
+    ACTIVATE_SCRIPT=".venv/bin/activate"
 fi
 
-echo "📦 Installation des dépendances..."
-pip install --upgrade pip
-pip install -r requirements.txt
+# Active l'environnement virtuel pour le reste de l'exécution du script Bash
+if [ -f "$ACTIVATE_SCRIPT" ]; then
+    source "$ACTIVATE_SCRIPT"
+else
+    echo "❌ Erreur : Impossible de trouver le script d'activation à l'emplacement $ACTIVATE_SCRIPT"
+    exit 1
+fi
 
-echo "✅ Tout est prêt !"
-echo "Pour lancer ton programme :"
-echo "source .venv/bin/activate  # ou .venv\\Scripts\\activate sous Windows"
+echo "📦 Installation des dépendances dans le venv avec uv..."
+# On force uv à utiliser le pip du venv activé pour tout installer proprement dedans
+uv pip install -r requirements.txt
+
+echo "✨ Tout est prêt !"
+echo "Pour activer ton venv manuellement dans ton terminal actuel :"
+echo "source $ACTIVATE_SCRIPT"
